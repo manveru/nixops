@@ -71,9 +71,9 @@ class Deployment:
     default_description = "Unnamed NixOps network"
 
     name: Optional[str] = nixops.util.attr_property("name", None)
-    nix_exprs = nixops.util.attr_property("nixExprs", [], "json")
-    nix_path = nixops.util.attr_property("nixPath", [], "json")
-    args = nixops.util.attr_property("args", {}, "json")
+    flake_uri = nixops.util.attr_property("flakeUri", None)
+    cur_flake_uri = nixops.util.attr_property("curFlakeUri", None)
+    args = nixops.util.attr_property("args", {}, 'json')
     description = nixops.util.attr_property("description", default_description)
     configs_path = nixops.util.attr_property("configsPath", None)
     rollback_enabled: bool = nixops.util.attr_property("rollbackEnabled", False)
@@ -122,6 +122,8 @@ class Deployment:
         self.logger.update_log_prefixes()
 
         self.definitions: Optional[Definitions] = None
+
+        self._cur_flake_uri = None
 
     @property
     def tempdir(self) -> nixops.util.SelfDeletingDir:
@@ -370,6 +372,16 @@ class Deployment:
         flags.extend(["-I", "nixops=" + self.expr_path])
         return flags
 
+    def _get_cur_flake_uri(self) -> str:
+        assert self.flake_uri is not None
+        if self._cur_flake_uri is None:
+            out = json.loads(subprocess.check_output(
+                ["nix", "flake", "info", "--json", "--", self.flake_uri],
+                stderr=self.logger.log_file))
+            self._cur_flake_uri = out['uri']
+        return self._cur_flake_uri
+
+
     def _eval_flags(self, exprs: List[str]) -> List[str]:
         flags = self._nix_path_flags()
         args = {key: RawValue(val) for key, val in self.args.items()}
@@ -380,25 +392,19 @@ class Deployment:
         ]
 
         flags.extend(
-            [
-                "--arg",
-                "networkExprs",
-                py2nix(exprs_, inline=True),
-                "--arg",
-                "args",
-                py2nix(args, inline=True),
-                "--argstr",
-                "uuid",
-                self.uuid,
-                "--argstr",
-                "deploymentName",
-                self.name if self.name else "",
-                "--arg",
-                "pluginNixExprs",
-                py2nix(extraexprs),
-                "<nixops/eval-machine-info.nix>",
-            ]
-        )
+            ["--arg", "networkExprs", py2nix(exprs_, inline=True),
+             "--arg", "args", py2nix(args, inline=True),
+             "--argstr", "uuid", self.uuid,
+             "--argstr", "deploymentName", self.name if self.name else "",
+             "--arg", "pluginNixExprs", py2nix(extraexprs),
+             self.expr_path + "/eval-machine-info.nix"])
+
+        if self.flake_uri is not None:
+            flags.extend(
+                [#"--pure-eval", # FIXME
+                 "--argstr", "flakeUri", self._get_cur_flake_uri(),
+                 "--allowed-uris", self.expr_path])
+
         return flags
 
     def set_arg(self, name: str, value: str) -> None:
@@ -965,6 +971,7 @@ class Deployment:
                 # configuration.
                 m.cur_configs_path = configs_path
                 m.cur_toplevel = m.new_toplevel
+                m.cur_flake_uri = self._get_cur_flake_uri() if self.flake_uri is not None else None
 
             except Exception as e:
                 # This thread shouldn't throw an exception because
@@ -1339,6 +1346,8 @@ class Deployment:
         if dry_activate:
             return
 
+        self.cur_flake_uri = self._get_cur_flake_uri() if self.flake_uri is not None else None
+
         # Trigger cleanup of resources, e.g. disks that need to be detached etc. Needs to be
         # done after activation to make sure they are not in use anymore.
         def cleanup_worker(r: nixops.resources.ResourceState) -> None:
@@ -1463,6 +1472,9 @@ class Deployment:
             test=False,
             max_concurrent_activate=max_concurrent_activate,
         )
+
+        self.cur_flake_uri = None
+
 
     def rollback(self, **kwargs: Any) -> None:
         with self._get_deployment_lock():
