@@ -56,11 +56,11 @@
               (import (nixops-aws + "/release.nix") {
                 inherit nixpkgs;
                 src = nixops-aws;
-              }).build.x86_64-linux
+              }).build.${final.system}
               (import (nixops-hetzner + "/release.nix") {
                 inherit nixpkgs;
                 src = nixops-hetzner;
-              }).build.x86_64-linux
+              }).build.${final.system}
             ];
 
           # For "nix dev-shell".

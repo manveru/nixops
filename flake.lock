@@ -2,15 +2,15 @@
     "inputs": {
         "nixops-aws": {
             "inputs": {},
-            "narHash": "sha256-ptjXve2UWSR7K8/QMUu8J5ybzZfuuPlxp24YxZtBiCU=",
-            "originalUrl": "github:NixOS/nixops-aws",
-            "url": "github:NixOS/nixops-aws/48a97f5b4825ff136d06340306d43996ff1fac5b"
+            "narHash": "sha256-+k9LgZXO4PEFNRA/aXFKvQlMCyL63/FxPJbRCOvdACk=",
+            "originalUrl": "github:kreisys/nixops-aws",
+            "url": "github:kreisys/nixops-aws/9f849ed07c48e67c7284a38e869ac21f39f4c2f9"
         },
         "nixops-hetzner": {
             "inputs": {},
-            "narHash": "sha256-Qf2XY0S59CXy3UvjqM8OuQdX3yHNmTMRdfKxg5OOlpU=",
+            "narHash": "sha256-2YDEG+84zjmLoyvDiNZAXPhhtt5yMlnwr9QB1Xu/8vo=",
             "originalUrl": "github:NixOS/nixops-hetzner",
-            "url": "github:NixOS/nixops-hetzner/ef99acaa329476beb45fc10753d9de3d2d257671"
+            "url": "github:NixOS/nixops-hetzner/6245ca44f3682e45d6d82cee7d873f76b51ff693"
         },
         "nixpkgs": {
             "inputs": {},
