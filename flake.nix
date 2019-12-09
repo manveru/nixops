@@ -18,14 +18,21 @@
   outputs = { self, nixpkgs, nixops-aws, nixops-hetzner }:
     let
 
+      systems = [ "x86_64-linux" "x86_64-darwin" ];
+
+      forAllSystems =
+        f: nixpkgs.lib.genAttrs systems (system: f system);
+
+      pkgsFor = system: import nixpkgs {
+        inherit system;
+        overlays = [ self.overlay ];
+      };
+
       officialRelease = false;
 
       version = "1.7" + (if officialRelease then "" else "pre${builtins.substring 0 8 self.lastModified}.${self.shortRev}");
 
-      pkgs = import nixpkgs {
-        system = "x86_64-linux";
-        overlays = [ self.overlay ];
-      };
+      pkgs = pkgsFor "x86_64-linux";
 
     in {
 
@@ -38,7 +45,7 @@
 
           buildInputs = [ python2Packages.nose python2Packages.coverage ];
 
-          nativeBuildInputs = [ pkgs.mypy ];
+          nativeBuildInputs = [ mypy ];
 
           propagatedBuildInputs = with python2Packages;
             [ prettytable
@@ -73,7 +80,7 @@
           '';
 
           # Needed by libcloud during tests.
-          SSL_CERT_FILE = "${pkgs.cacert}/etc/ssl/certs/ca-bundle.crt";
+          SSL_CERT_FILE = "${cacert}/etc/ssl/certs/ca-bundle.crt";
 
           # Add openssh to nixops' PATH. On some platforms, e.g. CentOS and RHEL
           # the version of openssh is causing errors with big networks (40+).
@@ -96,7 +103,7 @@
 
       hydraJobs = {
 
-        build.x86_64-linux = pkgs.nixops;
+        build = forAllSystems (system: (pkgsFor system).nixops);
 
         tarball = pkgs.releaseTools.sourceTarball {
           name = "nixops-tarball";
@@ -145,10 +152,13 @@
         }).test;
       };
 
-      checks.x86_64-linux.build = self.hydraJobs.build.x86_64-linux;
+      checks.build = self.hydraJobs.build.x86_64-linux;
 
-      packages.x86_64-linux.nixops = pkgs.nixops;
-      defaultPackage.x86_64-linux = pkgs.nixops;
+      packages = forAllSystems (system: {
+        inherit (pkgsFor system) nixops;
+      });
+
+      defaultPackage = forAllSystems (system: self.packages.${system}.nixops);
 
     };
 }
