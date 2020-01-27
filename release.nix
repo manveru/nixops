@@ -1,4 +1,5 @@
 { nixpkgs ? <nixpkgs>
+, src ? nixopsSrc
 , nixopsSrc ? { outPath = ./.; revCount = 0; shortRev = "abcdef"; rev = "HEAD"; }
 , officialRelease ? false
 , p ? (p: [ ])
