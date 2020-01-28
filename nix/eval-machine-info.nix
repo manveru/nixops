@@ -1,4 +1,6 @@
 { system ? builtins.currentSystem
+, nixpkgs ? <nixpkgs>
+, pkgs ? import nixpkgs { inherit system; }
 , networkExprs
 , flakeUri ? null
 , checkConfigurationOptions ? true
@@ -8,8 +10,7 @@
 , pluginNixExprs
 }:
 
-# FIXME: don't rely on <nixpkgs>.
-with import <nixpkgs> { inherit system; };
+with pkgs;
 with lib;
 
 
