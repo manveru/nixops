@@ -7,12 +7,15 @@
 , uuid
 , deploymentName
 , args
-, pluginNixExprs
+, pluginNixExprs ?
+  with pkgs; with lib; pipe nixops.propagatedBuildInputs [
+    (filter ({ name, ... }: hasPrefix "nixops-" name))
+    (map (plugin: plugin + "/share/nix/${getName plugin}"))
+  ]
 }:
 
 with pkgs;
 with lib;
-
 
 rec {
 
