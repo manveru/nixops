@@ -134,15 +134,6 @@ rec {
   #   }
   #   pluginResources;
 
-  # check if there are duplicate elements in a sorted list
-  noDups = l:
-    if length l > 1
-    then
-      if (head l) == (head (tail l))
-      then throw "found resources with duplicate names: ${head l}"
-      else noDups (tail l)
-    else true;
-
   # Phase 1: evaluate only the deployment attributes.
   info =
     let
