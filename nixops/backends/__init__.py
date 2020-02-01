@@ -94,7 +94,7 @@ class MachineState(nixops.resources.ResourceState):
         self.new_toplevel: Optional[str] = None
 
     def prefix_definition(self, attr):
-        return attr
+        return {('nodes'): attr}
 
     @property
     def started(self) -> bool:
