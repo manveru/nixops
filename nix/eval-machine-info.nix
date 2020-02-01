@@ -147,11 +147,7 @@ rec {
         { inherit (v.deployment) targetEnv targetPort targetHost alwaysActivate owners keys hasFastConnection;
           nixosRelease = v.system.nixos.release or v.system.nixosRelease or (removeSuffix v.system.nixosVersionSuffix v.system.nixosVersion);
           publicIPv4 = v.networking.publicIPv4;
-        }
-      (map
-        (f: f v)
-        pluginDeploymentConfigExporters
-      ));
+        } (map (f: f v) pluginDeploymentConfigExporters));
 
     # network = fold (as: bs: as // bs) {} (network'.network or []);
     inherit (network') network;
@@ -181,7 +177,6 @@ rec {
         res_set // { "${res_class}" = ( removeAttrs res_set."${res_class}" missing ); };
 
     in (removeAttrs resources' [ "machines" ]);
-
   };
 
   # Phase 2: build complete machine configurations.
