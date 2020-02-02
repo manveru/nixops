@@ -43,7 +43,7 @@ rec {
       {
         _module.args = {
           inherit pkgs baseModules pluginOptions pluginResources deploymentName args uuid pluginDeploymentConfigExporters;
-        } // args;
+        };
       }
     ] ++ networkExprs
       ++ optional (flakeUri != null)
