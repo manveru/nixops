@@ -45,7 +45,7 @@ rec {
           inherit pkgs baseModules pluginOptions pluginResources deploymentName uuid pluginDeploymentConfigExporters;
         };
       }
-    ] ++ networkExprs
+    ] ++ (map (e: (call (import e)) // { _file = e; } ) networkExprs);
       ++ optional (flakeUri != null)
         ((call (builtins.getFlake flakeUri).outputs.nixopsConfigurations.default) // { _file = "<${flakeUri}>"; });
     # specialArgs = { inherit baseModules pluginOptions; };
