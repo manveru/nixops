@@ -53,14 +53,9 @@
   };
 
   nixopsNode = types.submoduleWith ({
-    # specialArgs = {
-    #   # # TODO: Move these to not special args
-    #   # nodes = mapAttrs (_: id) config.nodes;
-    #   inherit baseModules;
-    # };
-
     modules = baseModules ++ [
       nodeArgsModule
+      deploymentInfoModule
       ({ name, ... }: rec {
         _file = "module at ${__curPos.file}:${toString __curPos.line}";
         key   = _file;
