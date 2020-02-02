@@ -33,7 +33,7 @@ rec {
   pluginDeploymentConfigExporters = (foldl (a: e: a ++ (e.config_exporters { inherit optionalAttrs pkgs; })) [] importedPluginNixExprs);
 
   network = let
-    baseModules = import (nixpkgs + "/nixos/modules/module-list.nix");
+    baseModules = import (pkgs.path + "/nixos/modules/module-list.nix");
 
     call = x: if builtins.isFunction x then x args else x;
 
