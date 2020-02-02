@@ -790,10 +790,6 @@ class Deployment:
                     )
                     # Use only a single machine for now (issue #103).
                     break
-                remote_machines_file = "{0}/nix.machines".format(self.tempdir)
-                with open(remote_machines_file, "w") as f:
-                    f.write("".join(remote_machines))
-                os.environ["NIX_REMOTE_SYSTEMS"] = remote_machines_file
             else:
                 self.logger.log(
                     "using predefined remote systems file: {0}".format(
