@@ -42,13 +42,15 @@ rec {
       ./network.nix
       {
         _module.args = {
-          inherit pkgs baseModules pluginOptions pluginResources deploymentName uuid pluginDeploymentConfigExporters;
-        };
+          inherit args pkgs baseModules pluginOptions pluginResources deploymentName uuid pluginDeploymentConfigExporters;
+        } // args;
       }
-    ] ++ (map (e: (call (import e)) // { _file = e; } ) networkExprs);
+    ] ++ (map (e: let {
+      _file = e;
+      imports = [ (call (import e)) ];
+    }) networkExprs)
       ++ optional (flakeUri != null)
         ((call (builtins.getFlake flakeUri).outputs.nixopsConfigurations.default) // { _file = "<${flakeUri}>"; });
-    # specialArgs = { inherit baseModules pluginOptions; };
   }).config;
 
   inherit (network) defaults nodes resources;
