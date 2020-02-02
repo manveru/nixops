@@ -94,19 +94,9 @@ in {
       default = {};
     };
 
-    # resources = mkOption {
-    #   type    = attrsOf (attrsOf unspecified);
-    #   default = {};
-    # };
-
     resources = let
       evalResources = resourceModule: _: mkOption {
         type = attrsOf (submoduleWith {
-          # modules = let modules' = (fixMergeModules [
-          #   resourceModule
-          #   deploymentInfoModule
-          #   ./resource.nix
-          # ] argsModule._module.args); in builtins.trace modules'.config._type modules';
           modules = let modules' = ([
             resourceModule
             resourceArgsModule
