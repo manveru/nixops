@@ -449,22 +449,27 @@ class Deployment:
     def evaluate_config(self, attr):
         try:
             # FIXME: use --json
+            cmd = (["nix-instantiate"]
+                   + self.extra_nix_eval_flags
+                   + self._eval_flags(self.nix_exprs)
+                   + [
+                       "--eval-only",
+                       "--xml",
+                       "--strict",
+                       "--arg",
+                       "checkConfigurationOptions",
+                       "false",
+                       "-A",
+                       attr,
+                   ])
+
+            if DEBUG:
+                print("Executing: {0}\n".format(' '.join(cmd)), file=sys.stderr) 
+
             xml = subprocess.check_output(
-                ["nix-instantiate"]
-                + self.extra_nix_eval_flags
-                + self._eval_flags(self.nix_exprs)
-                + [
-                    "--eval-only",
-                    "--xml",
-                    "--strict",
-                    "--arg",
-                    "checkConfigurationOptions",
-                    "false",
-                    "-A",
-                    attr,
-                ],
+                cmd,
                 stderr=self.logger.log_file,
-                text=True,
+                text=true
             )
             if DEBUG:
                 print("XML output of nix-instantiate:\n" + xml, file=sys.stderr)
