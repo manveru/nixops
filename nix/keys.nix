@@ -91,6 +91,14 @@ let
         <manvolnum>1</manvolnum></citerefentry>.
       '';
     };
+
+    options.generator = mkOption {
+      default = null;
+      type = with types; nullOr str;
+      description = ''
+        Script whose output will populate the key.
+      '';
+    };
   });
 
   convertOldKeyType = key: val: let
