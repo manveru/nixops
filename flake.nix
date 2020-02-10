@@ -3,8 +3,6 @@
 
   edition = 201909;
 
-  inputs.nixpkgs.uri = "nixpkgs/release-19.09";
-
   inputs.nixops-aws = {
     uri = github:kreisys/nixops-aws;
     flake = false;
