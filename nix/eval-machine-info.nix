@@ -1,5 +1,5 @@
 { system ? builtins.currentSystem
-, nixpkgs ? if flakeUri != null then flake.outputs.nixopsConfigurations.default.nixpkgs.path else <nixpkgs>
+, nixpkgs ? if flakeUri != null then "${flakeNetwork.nixpkgs}" else <nixpkgs>
 , pkgs    ? import nixpkgs { inherit system; }
 , nixops  ? (import ../release.nix { nixpkgs = pkgs.path; p = (p: [
   # (p.callPackage ../../nixops-aws/release.nix { officialRelease = true; })
@@ -8,6 +8,7 @@
 , networkExprs
 , flakeUri ? null
 , flake ? builtins.getFlake flakeUri
+, flakeNetwork ? (call flake.outputs.nixopsConfigurations.default) // { _file = "<${flakeUri}>"; }
 , checkConfigurationOptions ? true
 , uuid
 , deploymentName
@@ -17,6 +18,12 @@
     (filter ({ name, ... }: hasPrefix "nixops-" name))
     (map (plugin: plugin + "/share/nix/${getName plugin}"))
   ]
+, call ? e: rec {
+    lambda = e args;
+    set    = e;
+    path   = string;
+    string.imports = [ (call (import e) // { _file = e; }) ];
+  }.${builtins.typeOf e}
 }:
 
 with pkgs;
@@ -33,16 +40,6 @@ rec {
   network = let
     baseModules = import (pkgs.path + "/nixos/modules/module-list.nix");
 
-    call = e: rec {
-      lambda = e args;
-      set    = e;
-      path   = string;
-      string = {
-        _file = e;
-        imports = [ (call (import e)) ];
-      };
-    }.${builtins.typeOf e};
-
   in (evalModules {
     modules = [
       ./network.nix
@@ -52,8 +49,7 @@ rec {
         } // args;
       }
     ] ++ (map call networkExprs)
-      ++ optional (flakeUri != null)
-        ((call (builtins.getFlake flakeUri).outputs.nixopsConfigurations.default) // { _file = "<${flakeUri}>"; });
+      ++ (optional (flakeUri != null) (removeAttrs flakeNetwork [ "nixpkgs" ]));
   }).config;
 
   inherit (network) defaults nodes resources;
