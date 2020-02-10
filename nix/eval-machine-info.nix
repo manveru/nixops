@@ -1,7 +1,5 @@
 { system ? builtins.currentSystem
 , nixpkgs ? if flakeUri != null then flake.outputs.nixopsConfigurations.default.nixpkgs.path else <nixpkgs>
-, nixops ? (import ../release.nix { nixpkgs = pkgs.path; p = (p: [
-    (p.callPackage ../../nixops-aws/release.nix { officialRelease = true; })
 , pkgs    ? import nixpkgs { inherit system; }
 , nixops  ? (import ../release.nix { nixpkgs = pkgs.path; p = (p: [
   # (p.callPackage ../../nixops-aws/release.nix { officialRelease = true; })
