@@ -26,7 +26,7 @@
         overlays = [ self.overlay ];
       };
 
-      officialRelease = false;
+      officialRelease = true;
 
       version = "1.7" + (if officialRelease then "" else "pre${builtins.substring 0 8 self.lastModified}.${self.shortRev}");
 
