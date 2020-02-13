@@ -67,6 +67,7 @@
         deployment.targetHost = mkOverride 900 name;
         # Must be set for nixops to work on darwin
         nixpkgs.localSystem.system = "x86_64-linux";
+        documentation.nixos.enable = mkDefault false;
         _module.args = { inherit pkgs; };
       })
     ];
