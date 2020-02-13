@@ -553,7 +553,7 @@ class Deployment:
                     "checkConfigurationOptions",
                     "false",
                     "-A",
-                    "nodes.{0}.config.{1}".format(machine_name, option_name),
+                    "nodes.{0}.{1}".format(machine_name, option_name),
                 ]
                 + (["--json"] if json else [])
                 + (["--xml"] if xml else []),
