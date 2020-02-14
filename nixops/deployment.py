@@ -815,22 +815,27 @@ class Deployment:
             os.environ["NIX_CURRENT_LOAD"] = load_dir
 
         try:
+            cmd = (["nix-build"]
+                   + self._eval_flags(self.nix_exprs + [phys_expr])
+                   + [
+                       "--arg",
+                       "names",
+                       py2nix(names, inline=True),
+                       "-A",
+                       "machines",
+                       "-o",
+                       self.tempdir + "/configs",
+                   ]
+                   + ([ "--option", "builders", "".join(remote_machines)] if remote_machines != [] else [])
+                   + (["--dry-run"] if dry_run else [])
+                   + (["--repair"] if repair else []))
+
+            if DEBUG:
+                print("Executing: {0}\n".format(' '.join(cmd)), file=sys.stderr)
+
             configs_path = subprocess.check_output(
-                ["nix-build"]
-                + self._eval_flags(self.nix_exprs + [phys_expr])
-                + [
-                    "--arg",
-                    "names",
-                    py2nix(names, inline=True),
-                    "-A",
-                    "machines",
-                    "-o",
-                    self.tempdir + "/configs",
-                ]
-                + (["--dry-run"] if dry_run else [])
-                + (["--repair"] if repair else []),
+                cmd,
                 stderr=self.logger.log_file,
-                text=True,
             ).rstrip()
         except subprocess.CalledProcessError:
             raise Exception("unable to build all machine configurations")

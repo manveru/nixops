@@ -18,12 +18,15 @@
     (filter ({ name, ... }: hasPrefix "nixops-" name))
     (map (plugin: plugin + "/share/nix/${getName plugin}"))
   ]
-, call ? e: rec {
+  , call ? e: (rec {
     lambda = e args;
     set    = e;
     path   = string;
-    string.imports = [ (call (import e) // { _file = e; }) ];
-  }.${builtins.typeOf e}
+    string = {
+      _file = e;
+      imports = [ (call (import e)) ];
+    };
+  }.${builtins.typeOf e})
 }:
 
 with pkgs;
