@@ -28,7 +28,7 @@
 
       officialRelease = true;
 
-      version = "1.7" + (if officialRelease then "" else "pre${builtins.substring 0 8 self.lastModified}.${self.shortRev}");
+      version = "1.7" + (if officialRelease then "" else "pre${builtins.substring 0 8 self.lastModified}.${self.shortRev or "dirty"}");
 
       pkgs = pkgsFor "x86_64-linux";
 
@@ -124,7 +124,7 @@
           distPhase =
             ''
               # Generate the manual and the man page.
-              cp ${(import ./doc/manual { revision = self.rev; inherit nixpkgs; }).optionsDocBook} doc/manual/machine-options.xml
+              cp ${(import ./doc/manual { revision = self.rev or "dirty"; inherit nixpkgs; }).optionsDocBook} doc/manual/machine-options.xml
 
               for i in scripts/nixops setup.py doc/manual/manual.xml; do
                 substituteInPlace $i --subst-var-by version ${version}
