@@ -52,11 +52,11 @@
               typing
               pluggy
               (import (nixops-aws + "/release.nix") {
-                inherit nixpkgs;
+                nixpkgs = final.path;
                 src = nixops-aws;
               }).build.${final.system}
               (import (nixops-hetzner + "/release.nix") {
-                inherit nixpkgs;
+                nixpkgs = final.path;
                 src = nixops-hetzner;
               }).build.${final.system}
             ];
