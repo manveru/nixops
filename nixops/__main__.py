@@ -18,6 +18,10 @@ subparsers: _SubParsersAction = parser.add_subparsers(
 
 subparser = add_subparser(subparsers, "list", help="list all known deployments")
 subparser.set_defaults(op=op_list_deployments)
+subparser.add_argument(
+    '--plain',  action='store_true', help='do not pretty-print the output'
+)
+
 
 subparser = add_subparser(subparsers, "create", help="create a new deployment")
 subparser.set_defaults(op=op_create)
