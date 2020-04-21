@@ -75,7 +75,7 @@ let
 
   nixops = poetry2nix.mkPoetryApplication {
 
-    src = ./.;
+    projectDir = ./.;
 
     propagatedBuildInputs = [
       pkgs.openssh
