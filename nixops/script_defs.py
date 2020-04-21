@@ -115,16 +115,16 @@ def op_list_deployments(args):
                     ("Type", "c"),
                 ]
             )
-        for depl in sort_deployments(sf.get_all_deployments()):
-            tbl.add_row(
-                [
-                    depl.uuid,
-                    depl.name or "(none)",
-                    depl.description,
-                    len(depl.machines),
-                    ", ".join(set(m.get_type() for m in depl.machines.values())),
-                ]
-            )
+            for depl in sort_deployments(sf.get_all_deployments()):
+                tbl.add_row(
+                    [
+                        depl.uuid,
+                        depl.name or "(none)",
+                        depl.description,
+                        len(depl.machines),
+                        ", ".join(set(m.get_type() for m in depl.machines.values())),
+                    ]
+                )
             print(tbl)
 
 
