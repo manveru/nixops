@@ -16,7 +16,8 @@ let
 
     # The complete buildEnv drv
     buildEnvDrv = interpreter.buildEnv.override {
-      extraLibs = plugins;
+      extraLibs = builtins.map (p: interpreter.pkgs.toPythonModule p) plugins;
+      ignoreCollisions = true;
     };
 
     # Create a separate environment aggregating the share directory
@@ -110,4 +111,4 @@ let
 
   };
 
-in nixops.python.pkgs.nixops
+in nixops.python.pkgs.nixops.withPlugins(_: [])
